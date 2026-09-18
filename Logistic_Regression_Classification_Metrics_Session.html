@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression & Classification Metrics — 3-Hour Session</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0b1a;--card:#181530;--alt:#211c40;--code:#0a0817;
+    --accent:#ec4899;--glow:rgba(236,72,153,.13);
+    --teal:#2dd4bf;--purple:#a78bfa;--gold:#facc15;--coral:#fb7185;
+    --green:#34d399;--orange:#fb923c;--sky:#7dd3fc;
+    --text:#e7e5f5;--muted:#9992b8;--dim:#5b5480;--border:#2a2450;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+
+  .top-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,11,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+  .nav-title{padding:10px 20px 0;font-family:'Playfair Display',serif;font-size:14.5px;font-weight:800;color:var(--accent);letter-spacing:.4px;}
+  .nav-tabs{display:flex;overflow-x:auto;padding:6px 12px;gap:3px;scrollbar-width:none;}
+  .nav-tabs::-webkit-scrollbar{display:none;}
+  .nav-tab{flex-shrink:0;padding:7px 13px;border-radius:8px;font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .3s;border:1px solid transparent;white-space:nowrap;}
+  .nav-tab:hover{color:var(--text);background:var(--card);}
+  .nav-tab.active{color:var(--accent);background:var(--glow);border-color:rgba(236,72,153,.35);}
+
+  .pages-wrap{margin-top:82px;height:calc(100vh - 82px);overflow:hidden;position:relative;}
+  .page{display:none;height:100%;overflow-y:auto;padding:28px 20px 60px;scroll-behavior:smooth;}
+  .page.active{display:block;}
+  .pg{max-width:840px;margin:0 auto;}
+
+  h1{font-family:'Playfair Display',serif;font-size:32px;font-weight:800;margin-bottom:5px;line-height:1.2;}
+  h2{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;margin:32px 0 12px;color:var(--accent);}
+  h3{font-size:16.5px;font-weight:700;margin:20px 0 8px;color:var(--teal);}
+  p,li{font-size:14.5px;line-height:1.75;margin-bottom:8px;}
+  .sub{font-size:15.5px;color:var(--muted);margin-bottom:26px;line-height:1.6;}
+
+  .cd{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin:16px 0;transition:border-color .3s;}
+  .cd:hover{border-color:rgba(236,72,153,.28);}
+  .cd.hl{border-left:4px solid var(--accent);}
+  .cd.warn{border-left:4px solid var(--gold);}
+  .cd.err{border-left:4px solid var(--coral);}
+  .cd.info{border-left:4px solid var(--sky);}
+  .cd.ok{border-left:4px solid var(--green);}
+  .cd.purp{border-left:4px solid var(--purple);}
+  .tg{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;padding:3px 8px;border-radius:5px;margin-bottom:9px;}
+  .tg.bl{background:rgba(236,72,153,.16);color:var(--accent);}
+  .tg.yl{background:rgba(250,204,21,.13);color:var(--gold);}
+  .tg.rd{background:rgba(251,113,133,.13);color:var(--coral);}
+  .tg.gn{background:rgba(52,211,153,.13);color:var(--green);}
+  .tg.sk{background:rgba(125,211,252,.13);color:var(--sky);}
+  .tg.pp{background:rgba(167,139,250,.13);color:var(--purple);}
+  .tg.or{background:rgba(251,146,60,.13);color:var(--orange);}
+
+  .fm{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--accent);letter-spacing:.4px;}
+
+  .co{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:15px 16px;margin:12px 0;overflow-x:auto;position:relative;}
+  .co code{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;color:var(--text);white-space:pre;}
+  .cl{position:absolute;top:6px;right:10px;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--dim);text-transform:uppercase;}
+  .kw{color:#c792ea;}.fn{color:#82aaff;}.str{color:#c3e88d;}.cm{color:#7a7099;}.num{color:#f78c6c;}.op{color:#89ddff;}
+
+  .ex{background:linear-gradient(135deg,rgba(236,72,153,.06),rgba(45,212,191,.03));border:1px solid rgba(236,72,153,.18);border-radius:14px;padding:20px;margin:16px 0;}
+  .ex .et{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:11px;}
+
+  .biz{background:linear-gradient(135deg,rgba(52,211,153,.07),rgba(125,211,252,.04));border:1px solid rgba(52,211,153,.22);border-radius:14px;padding:20px;margin:16px 0;}
+  .biz .et{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--green);margin-bottom:11px;}
+
+  .tb{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+  .tb th{background:var(--alt);color:var(--accent);padding:8px 11px;text-align:left;font-weight:700;font-size:12px;letter-spacing:.4px;border-bottom:2px solid var(--border);}
+  .tb td{padding:8px 11px;border-bottom:1px solid var(--border);}
+  .tb tr:hover td{background:rgba(236,72,153,.04);}
+
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:14px 0;}
+  .gc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+  .gc.pro{border-top:3px solid var(--green);}.gc.con{border-top:3px solid var(--coral);}
+  .gc h4{font-size:13px;font-weight:700;margin-bottom:7px;}
+  .gc.pro h4{color:var(--green);}.gc.con h4{color:var(--coral);}
+  .gc ul{padding-left:14px;}.gc li{font-size:12.5px;margin-bottom:4px;color:var(--muted);}
+
+  .bds{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;}
+  .bd{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;flex:1;min-width:110px;text-align:center;}
+  .bd .v{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;color:var(--accent);}
+  .bd .l{font-size:10.5px;color:var(--muted);margin-top:2px;}
+
+  .st{counter-reset:s;list-style:none;padding:0;}
+  .st li{counter-increment:s;padding:11px 11px 11px 50px;position:relative;margin-bottom:6px;border-radius:10px;background:var(--card);border:1px solid var(--border);}
+  .st li::before{content:counter(s);position:absolute;left:12px;top:11px;width:25px;height:25px;background:var(--glow);border:1px solid rgba(236,72,153,.35);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);}
+
+  .fl{display:flex;align-items:center;gap:6px;margin:16px 0;overflow-x:auto;padding:6px 0;}
+  .fb{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 14px;text-align:center;font-size:12px;font-weight:600;flex-shrink:0;min-width:90px;}
+  .fa{color:var(--accent);font-size:16px;flex-shrink:0;}
+
+  .qz{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin:16px 0;}
+  .qz .qt{font-weight:600;margin-bottom:11px;font-size:14px;}
+  .qo{display:block;padding:9px 13px;margin:4px 0;border-radius:8px;border:1px solid var(--border);background:var(--alt);cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s;}
+  .qo:hover{border-color:var(--accent);color:var(--text);}
+  .qo.ok{border-color:var(--green);background:rgba(52,211,153,.07);color:var(--green);}
+  .qo.no{border-color:var(--coral);background:rgba(251,113,133,.07);color:var(--coral);}
+  .qf{display:none;margin-top:9px;padding:9px 13px;border-radius:8px;font-size:12px;line-height:1.6;}
+  .qf.show{display:block;}.qf.r{background:rgba(52,211,153,.07);color:var(--green);}.qf.w{background:rgba(251,113,133,.07);color:var(--coral);}
+
+  .iq{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 17px;margin:11px 0;cursor:pointer;}
+  .iq .qh{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:13.5px;color:var(--text);}
+  .iq .qh .car{color:var(--accent);transition:transform .25s;font-size:12px;}
+  .iq.open .qh .car{transform:rotate(180deg);}
+  .iq .ans{display:none;margin-top:11px;padding-top:11px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.7;}
+  .iq.open .ans{display:block;}
+
+  .tip{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:12px;padding:14px 17px;margin:10px 0;}
+  .tip .tn{font-size:12.5px;font-weight:700;color:var(--teal);margin-bottom:4px;}
+
+  .prog{position:fixed;bottom:0;left:0;height:3px;background:var(--accent);transition:width .15s;z-index:100;}
+
+  @media(max-width:700px){
+    h1{font-size:24px;}h2{font-size:20px;}
+    .g2,.g3{grid-template-columns:1fr;}
+    .page{padding:20px 14px 56px;}
+    .nav-tab{font-size:10.5px;padding:5px 9px;}
+    .fl{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-title">🎯 Logistic Regression & Classification Metrics — 3-Hour Session</div>
+  <div class="nav-tabs" id="navTabs"></div>
+</nav>
+
+<div class="pages-wrap">
+
+<!-- PAGE 0: AGENDA -->
+<div class="page" id="page-0">
+<div class="pg">
+  <h1>Session Agenda — Day 3</h1>
+  <p class="sub">Days 1-2 predicted numbers. Day 3 predicts <strong>categories</strong> — spam or not spam, cancer or no cancer, this species or that one. Every topic follows: <strong>1) definition, 2) formula, 3) worked example, 4) visual</strong> — and every metric is tied back to a real business decision, not just a formula to memorize.</p>
+
+  <h2>Today's Agenda</h2>
+  <table class="tb">
+    <tr><th>#</th><th>Topic</th><th>Approx. Time</th></tr>
+    <tr><td>1</td><td><strong>Introduction to Logistic Regression</strong></td><td>15 min</td></tr>
+    <tr><td>2</td><td><strong>Sigmoid, Logit & Odds Ratio</strong></td><td>20 min</td></tr>
+    <tr><td>3</td><td><strong>Binary Classification & Business Use Cases</strong></td><td>15 min</td></tr>
+    <tr><td>4</td><td><strong>Binary Logistic Regression (Decision Boundary)</strong></td><td>15 min</td></tr>
+    <tr><td>5</td><td><strong>Multiclass Classification & Softmax</strong></td><td>15 min</td></tr>
+    <tr><td>6</td><td><strong>Confusion Matrix — Deep Dive</strong></td><td>25 min</td></tr>
+    <tr><td>7</td><td><strong>Type I & Type II Errors, Alpha & Beta — Deep Dive</strong></td><td>25 min</td></tr>
+    <tr><td>8</td><td><strong>Classification Metrics (Precision, Recall, F1, Specificity)</strong></td><td>20 min</td></tr>
+    <tr><td>9</td><td><strong>ROC Curve & AUC</strong></td><td>15 min</td></tr>
+    <tr><td>10</td><td><strong>Hands-On: Breast Cancer (Binary)</strong></td><td>20 min</td></tr>
+    <tr><td>11</td><td><strong>Hands-On: Iris (Multiclass)</strong></td><td>15 min</td></tr>
+    <tr><td>12</td><td><strong>Pro Tips</strong></td><td>10 min</td></tr>
+    <tr><td>13</td><td><strong>Workshop</strong></td><td>self-paced</td></tr>
+    <tr><td>14</td><td><strong>Quiz</strong></td><td>10 min</td></tr>
+    <tr><td>15</td><td><strong>Interview Questions</strong></td><td>reference</td></tr>
+  </table>
+
+  <div class="cd hl">
+    <span class="tg bl">How Every Topic Is Structured</span>
+    <ol class="st">
+      <li><strong>Definition</strong> — plain language, what it is and why it matters</li>
+      <li><strong>Formula</strong> — the mechanics behind it</li>
+      <li><strong>Worked Example</strong> — with a real business use case attached</li>
+      <li><strong>Visual</strong> — a diagram so you can literally see the idea</li>
+    </ol>
+  </div>
+
+  <div class="biz">
+    <div class="et">💼 Business Use Cases Woven Through Every Topic</div>
+    <p><strong>Medical diagnosis</strong> (cancer screening — our main hands-on dataset), <strong>spam email filtering</strong>, <strong>credit card fraud detection</strong>, and <strong>loan default prediction</strong> — the same handful of real scenarios recur throughout, so every formula gets grounded in "what does this mean for the business, and who gets hurt by which mistake?"</p>
+  </div>
+
+  <div class="cd info">
+    <span class="tg sk">Companion File</span>
+    <p>📓 <strong>Logistic_Regression_Classification_Metrics_Practical.ipynb</strong> — built for Google Colab with Drive mounting, deep EDA, both hands-on datasets, and a threshold-tuning demo that directly ties to today's Type I/II discussion.</p>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">Trainer Note</span>
+    <p>When you reach the Confusion Matrix and Type I/II sections, slow down. Ask the class: "if this were a real hospital, which mistake would you rather make?" before revealing the answer — it's the single best way to make error trade-offs stick.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 1: INTRO TO LOGISTIC REGRESSION -->
+<div class="page" id="page-1">
+<div class="pg">
+  <h1>Introduction to Logistic Regression</h1>
+  <p class="sub">Why we need an entirely different tool than linear regression the moment the target becomes a category instead of a number.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>Logistic Regression models the relationship between a categorical outcome and one or more input features</strong>, using the logistic (sigmoid) function to turn a linear combination of inputs into a probability between 0 and 1 — which is then converted into a class prediction using a threshold (usually 0.5).</p>
+  </div>
+
+  <h2>Why Not Just Use Linear Regression?</h2>
+  <div class="ex">
+    <div class="et">🎓 The Problem With a Straight Line for Yes/No Outcomes</div>
+    <p>If you fit a plain linear regression line to predict "has disease (1) or not (0)," the line can predict values like <strong>-0.3</strong> or <strong>1.8</strong> — numbers that make no sense as a probability. Logistic regression fixes this by squeezing every prediction into the valid [0, 1] range.</p>
+  </div>
+
+  <h2>Key Characteristics</h2>
+  <table class="tb">
+    <tr><th>Aspect</th><th>Detail</th></tr>
+    <tr><td>Output</td><td>Probabilities between 0 and 1</td></tr>
+    <tr><td>Nature</td><td>A classification algorithm (despite the name "regression")</td></tr>
+    <tr><td>Decision Boundary</td><td>A threshold (usually 0.5) converts probability into a class</td></tr>
+  </table>
+
+  <div class="biz">
+    <div class="et">💼 Business Use Case</div>
+    <p>A hospital wants to predict whether a tumor is malignant from measurements like size and texture. A bank wants to predict whether a loan applicant will default. An email provider wants to predict whether a message is spam. All three are the exact same underlying math problem: <strong>predict the probability of a binary outcome.</strong></p>
+  </div>
+
+  <h2>Visual — Linear Regression vs Logistic Regression</h2>
+  <div class="ex">
+    <svg viewBox="0 0 600 220" style="width:100%;height:auto;">
+      <text x="150" y="20" text-anchor="middle" font-size="12" style="fill:var(--coral);font-weight:700">Linear Regression (wrong tool)</text>
+      <line x1="30" y1="180" x2="270" y2="180" style="stroke:var(--dim);stroke-width:1"/>
+      <line x1="30" y1="180" x2="30" y2="30" style="stroke:var(--dim);stroke-width:1"/>
+      <circle cx="50" cy="170" r="4" style="fill:var(--coral)"/>
+      <circle cx="70" cy="172" r="4" style="fill:var(--coral)"/>
+      <circle cx="220" cy="45" r="4" style="fill:var(--teal)"/>
+      <circle cx="240" cy="42" r="4" style="fill:var(--teal)"/>
+      <line x1="30" y1="175" x2="260" y2="30" style="stroke:var(--coral);stroke-width:2"/>
+      <text x="15" y="20" font-size="9" style="fill:var(--muted)">can predict &gt;1 or &lt;0!</text>
+
+      <text x="450" y="20" text-anchor="middle" font-size="12" style="fill:var(--teal);font-weight:700">Logistic Regression (correct tool)</text>
+      <line x1="330" y1="180" x2="570" y2="180" style="stroke:var(--dim);stroke-width:1"/>
+      <line x1="330" y1="180" x2="330" y2="30" style="stroke:var(--dim);stroke-width:1"/>
+      <circle cx="350" cy="170" r="4" style="fill:var(--coral)"/>
+      <circle cx="370" cy="172" r="4" style="fill:var(--coral)"/>
+      <circle cx="520" cy="45" r="4" style="fill:var(--teal)"/>
+      <circle cx="540" cy="42" r="4" style="fill:var(--teal)"/>
+      <path d="M330,175 C400,175 420,45 450,45 C480,45 500,40 560,38" fill="none" style="stroke:var(--teal);stroke-width:2.5"/>
+      <text x="440" y="200" font-size="9" style="fill:var(--muted)">always stays within [0,1]</text>
+    </svg>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 2: SIGMOID, LOGIT, ODDS -->
+<div class="page" id="page-2">
+<div class="pg">
+  <h1>Sigmoid, Logit & Odds Ratio</h1>
+  <p class="sub">The mathematical machinery that turns "any number at all" into "a well-behaved probability" — and back again.</p>
+
+  <div class="cd hl">
+    <span class="tg bl">Start Here If You're Getting Confused — The Whole Chain, One Example</span>
+    <p>These four ideas aren't four separate things to memorize — they're one chain, each link only existing to feed the next. Let's walk it using one running example: <strong>will a student pass an exam?</strong></p>
+    <ol class="st">
+      <li><strong>Probability (you already know this).</strong> It just says "how likely is this?" on a scale of 0 to 1. "There's a 70% chance this student passes" means p = 0.7. Nothing tricky yet.</li>
+      <li><strong>Odds — the same idea, said differently.</strong> Odds compare "chance it happens" to "chance it doesn't": Odds = p/(1−p). For our student: 0.7/0.3 = <strong>2.33</strong>. That means "this student is 2.33 times more likely to pass than fail" — the exact phrasing a horse-racing announcer uses when they say "3 to 1 odds." <strong>Key difference from probability:</strong> probability is capped at 1 (100%); odds can go all the way up to infinity for a near-certain event.</li>
+      <li><strong>Odds Ratio — comparing odds between two groups.</strong> Now bring in a second student who barely studied, p = 0.5, so their odds = 0.5/0.5 = 1.0. Odds Ratio = 2.33/1.0 = <strong>2.33</strong>. This says "the first student's odds of passing are 2.33× higher than the second student's" — exactly the phrasing behind headlines like "smokers have 3× higher odds of disease than non-smokers."</li>
+      <li><strong>Sigmoid — the piece that makes all of this possible in the first place.</strong> Inside logistic regression, the model first computes a raw score like z = b₀ + b₁×(hours studied). This z can be ANY number — -50, 0, +200, nothing stops it. But a probability must stay between 0 and 1. Sigmoid is the "squishing machine" that takes any number in and always pushes out something safely between 0 and 1: very negative z gets squished near 0, very positive z gets squished near 1, and z=0 exactly comes out as 0.5.</li>
+    </ol>
+    <p><strong>The full pipeline:</strong> Raw score (any number) → <strong>sigmoid squishes it</strong> → Probability (0 to 1) → <strong>now you can compute Odds</strong> → compare two Odds and you get an <strong>Odds Ratio</strong>. Each step only exists to feed the next one.</p>
+  </div>
+
+  <div class="ex">
+    <div class="et">🎓 Visual — The Whole Pipeline in One Picture</div>
+    <svg viewBox="0 0 700 190" style="width:100%;height:auto;">
+      <rect x="20" y="65" width="140" height="45" rx="8" style="fill:var(--card);stroke:var(--muted);stroke-width:1.5"/>
+      <text x="90" y="90" text-anchor="middle" font-size="11" style="fill:var(--muted);font-weight:700">Raw score z</text>
+      <text x="90" y="105" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">(any number: -8, 0, +8...)</text>
+      <line x1="160" y1="87" x2="210" y2="87" style="stroke:var(--accent);stroke-width:2"/>
+      <polygon points="210,87 200,82 200,92" style="fill:var(--accent)"/>
+      <text x="185" y="75" text-anchor="middle" font-size="9.5" style="fill:var(--accent);font-weight:700">sigmoid</text>
+
+      <rect x="215" y="30" width="180" height="140" rx="10" style="fill:var(--glow);stroke:var(--accent);stroke-width:1.5"/>
+      <path d="M235,145 C260,145 275,145 290,130 C305,115 305,80 320,65 C335,50 360,45 375,45" fill="none" style="stroke:var(--accent);stroke-width:2.5"/>
+      <text x="305" y="165" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">0 to 1, always</text>
+
+      <line x1="395" y1="87" x2="445" y2="87" style="stroke:var(--teal);stroke-width:2"/>
+      <polygon points="445,87 435,82 435,92" style="fill:var(--teal)"/>
+      <rect x="450" y="65" width="120" height="45" rx="8" style="fill:var(--card);stroke:var(--teal);stroke-width:1.5"/>
+      <text x="510" y="90" text-anchor="middle" font-size="11" style="fill:var(--teal);font-weight:700">Probability p</text>
+      <text x="510" y="105" text-anchor="middle" font-size="9.5" style="fill:var(--teal)">(0 to 1)</text>
+
+      <line x1="570" y1="87" x2="610" y2="87" style="stroke:var(--gold);stroke-width:2"/>
+      <polygon points="610,87 600,82 600,92" style="fill:var(--gold)"/>
+      <text x="590" y="75" text-anchor="middle" font-size="9" style="fill:var(--gold);font-weight:700">p/(1-p)</text>
+      <rect x="613" y="65" width="75" height="45" rx="8" style="fill:var(--card);stroke:var(--gold);stroke-width:1.5"/>
+      <text x="650" y="90" text-anchor="middle" font-size="10.5" style="fill:var(--gold);font-weight:700">Odds</text>
+      <text x="650" y="103" text-anchor="middle" font-size="9" style="fill:var(--gold)">→ Ratio</text>
+    </svg>
+    <p>Each arrow is a one-way conversion: you can always go raw score → probability → odds → odds ratio. Getting confused usually means mixing up which stage you're looking at — always ask yourself "am I looking at the raw score, the probability, or the odds right now?"</p>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">Wait — If Sigmoid Already Gives Probability, Why Do We Need Odds At All?</span>
+    <p>Fair question. For making a prediction, you're right — you never need odds; probability alone is enough. But odds isn't a bonus step tacked on AFTER probability — it's actually <strong>where the sigmoid formula comes from in the first place.</strong></p>
+    <p>The raw score z isn't just some arbitrary number that sigmoid happens to squish. z is <em>defined</em> to be the log of the odds: <code>ln(p/(1−p)) = z</code>. Solve that equation for p, and the sigmoid formula falls out automatically — it's not a separate trick, it's the algebraic result of that one definition.</p>
+    <p>Check it with our numbers: z = 1.386 → e<sup>1.386</sup> = <strong>4</strong> (the odds) → 4/(1+4) = <strong>0.8</strong> (the probability, matching sigmoid(1.386)). These three numbers — z, odds, probability — aren't three different facts. They're <strong>the same fact in three different units</strong>, exactly like 0°C = 32°F = 273K describe the same temperature. Probability is the unit for making a decision; odds is the everyday "3-to-1" unit; log-odds (z) is the only one of the three that's unbounded, which is exactly why it's the one the model can honestly set equal to a linear combination of features.</p>
+    <p>The other practical reason odds matters: a trained coefficient tells you "how much the log-odds change per +1 unit of a feature" — meaningless to a normal person. But e<sup>coefficient</sup> converts it into an odds ratio, which is how results actually get reported: <em>"each extra cigarette per day multiplies the odds of disease by 1.05."</em></p>
+  </div>
+
+  <div class="cd err">
+    <span class="tg rd">Precise Correction — z Equals LOG-Odds, Not Odds Itself</span>
+    <p>A very common mix-up: "so the linear equation's raw output IS the odds, right?" <strong>Not quite</strong> — it's the <em>log</em> of the odds, and that "log" is doing essential work, not decoration.</p>
+    <p><strong>Why the log can't be skipped:</strong> Odds = p/(1−p) can never be negative — it's always ≥ 0. But a linear equation z = b₀+b₁x₁+... can absolutely come out negative (any bᵢ could be negative). So you cannot set <code>z = odds</code> directly — the two sides don't even share the same valid range. Taking the log of the odds removes that floor: log(odds) can be any real number, negative, zero, or positive — now it matches exactly what a linear equation can produce. That's the whole reason the log is there.</p>
+    <p><strong>Correct chain:</strong> z = log(odds) &nbsp;→&nbsp; odds = e<sup>z</sup> &nbsp;→&nbsp; probability = e<sup>z</sup>/(1+e<sup>z</sup>). Using our number: z=1.386 is <em>not</em> the odds (4) — it's ln(4), which equals 1.386. You must exponentiate z to get the actual odds back.</p>
+  </div>
+
+  <div class="cd info">
+    <span class="tg sk">One Number, Two Names — mx+c IS the Log-Odds</span>
+    <p>A key point that resolves most of the remaining confusion: <strong>the model does not compute "mx+c" and "log-odds" as two separate things.</strong> It computes <code>z = mx + c</code> exactly once — the same familiar formula from linear regression — and then <em>chooses to interpret</em> that single number as the log-odds, purely because that interpretation is what makes converting it into a valid probability possible.</p>
+    <p><strong>Explaining this to a student, simply:</strong> "mx+c is a raw ingredient both linear regression and logistic regression compute the same way. Linear regression says 'this raw number IS my final answer.' Logistic regression says 'this raw number is NOT my final answer — let's call it the log-odds, then run it through one more step (sigmoid) to get a probability.'" It's like a thermometer reading: 100°C and 212°F are the same physical temperature, just two name-tags on one measurement — z and log(p/(1−p)) are the same relationship.</p>
+  </div>
+
+  <div class="cd ok">
+    <span class="tg gn">📝 Note to Self — How to Explain "mx+c is Log-Odds"</span>
+    <p>In logistic regression, <code>mx+c</code> is <strong>not</strong> the probability directly. It is the model's linear score, and we <em>define</em> this score as the log-odds of the event. Therefore:</p>
+    <div class="fm">mx + c = log( p / (1−p) )</div>
+    <p>The sigmoid function then converts this log-odds score into a probability between 0 and 1.</p>
+    <p><strong>An even simpler version:</strong> Logistic regression assumes that the log-odds change linearly with the input variable. Therefore, mx+c represents the log-odds, not the probability. We use the sigmoid function to convert mx+c into probability.</p>
+    <p><strong>With notation:</strong></p>
+    <div class="fm">z = mx + c</div>
+    <div class="fm">z = log(odds) = log( p / (1−p) )</div>
+    <p><strong>Therefore:</strong></p>
+    <div class="fm">p = 1 / (1 + e<sup>−z</sup>) = 1 / (1 + e<sup>−(mx+c)</sup>)</div>
+    <p><strong>A short verbal explanation to give in class:</strong> "The straight-line expression mx+c gives the customer's log-odds. A positive score means odds greater than 1, a negative score means odds less than 1, and a score of 0 means 50% probability. The sigmoid function transforms this score into the final probability."</p>
+  </div>
+
+  <div class="cd hl">
+    <span class="tg bl">Deriving Sigmoid — The Full Step-by-Step Algebra</span>
+    <p>Here's exactly how solving "log-odds = linear equation" for p produces the sigmoid formula — not asserted, but derived line by line.</p>
+    <p><strong>Start here</strong> — we define the log-odds to equal our linear equation:</p>
+    <div class="fm">ln( p / (1−p) ) = z &nbsp;&nbsp;&nbsp; (where z = b₀ + b₁x₁ + ...)</div>
+    <p><strong>Now solve for p, one step at a time:</strong></p>
+    <div class="co"><span class="cl">Algebra</span><code>p / (1-p) = e^z              <span class="cm">← exponentiate both sides (this IS the odds!)</span>
+p = e^z &times; (1-p)         <span class="cm">← multiply both sides by (1-p)</span>
+p = e^z - e^z&middot;p         <span class="cm">← expand the right-hand side</span>
+p + e^z&middot;p = e^z         <span class="cm">← move the e^z&middot;p term to the left</span>
+p(1 + e^z) = e^z          <span class="cm">← factor out p</span>
+p = e^z / (1 + e^z)        <span class="cm">← divide both sides by (1 + e^z)</span>
+p = 1 / (1 + e^-z)         <span class="cm">← divide top &amp; bottom by e^z — this IS the sigmoid formula!</span></code></div>
+    <p>Nothing was invented mid-way — every line follows from ordinary algebra on the previous one. This is the proof that sigmoid isn't an arbitrary "squishing function" someone picked because it looked nice; it's the unique formula that falls out when you insist "log-odds = linear equation" and solve for probability.</p>
+  </div>
+
+  <h2>The Sigmoid Function — Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>The sigmoid function is an S-shaped curve that squeezes any real number into the range (0, 1)</strong> — turning the model's raw linear score into something that behaves like a probability.</p>
+  </div>
+  <div class="fm">σ(z) = 1 / (1 + e<sup>−z</sup>)</div>
+
+  <h2>Visual — The Sigmoid Curve</h2>
+  <div class="ex">
+    <svg viewBox="0 0 500 220" style="width:100%;max-width:460px;height:auto;">
+      <line x1="40" y1="180" x2="460" y2="180" style="stroke:var(--dim);stroke-width:1"/>
+      <line x1="250" y1="20" x2="250" y2="180" stroke-dasharray="3,3" style="stroke:var(--muted);stroke-width:1"/>
+      <line x1="40" y1="100" x2="460" y2="100" stroke-dasharray="3,3" style="stroke:var(--gold);stroke-width:1"/>
+      <text x="470" y="104" font-size="10" style="fill:var(--gold)">0.5</text>
+      <path d="M40,175 C120,175 180,170 220,140 C240,120 260,80 280,60 C320,30 380,25 460,25" fill="none" style="stroke:var(--accent);stroke-width:2.5"/>
+      <text x="250" y="200" font-size="11" text-anchor="middle" style="fill:var(--muted)">z = 0 (threshold point)</text>
+      <text x="70" y="165" font-size="10" style="fill:var(--muted)">z very negative → σ(z)→0</text>
+      <text x="330" y="40" font-size="10" style="fill:var(--muted)">z very positive → σ(z)→1</text>
+    </svg>
+  </div>
+
+  <h2>The Logit Function — Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>The logit is the sigmoid's inverse</strong> — it takes a probability (0 to 1) and converts it back into an unrestricted real number. It's defined as the natural log of the odds.</p>
+  </div>
+  <div class="fm">logit(p) = ln( p / (1 − p) )</div>
+
+  <h2>Odds and Odds Ratio — Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>Odds compare the probability of an event happening to it not happening.</strong> An <strong>odds ratio</strong> compares those odds between two groups — a common way doctors and researchers communicate risk.</p>
+  </div>
+  <div class="fm">Odds = p / (1 − p) &nbsp;&nbsp;|&nbsp;&nbsp; Odds Ratio = Odds<sub>Group A</sub> / Odds<sub>Group B</sub></div>
+
+  <div class="biz">
+    <div class="et">💼 Business Use Case — Odds Ratio in Medicine</div>
+    <p>"Smokers have 3× the odds of developing the disease compared to non-smokers" is an odds ratio of 3 — a phrasing you've almost certainly seen in a health headline. In our breast cancer model, a coefficient's exponentiated value (e<sup>coefficient</sup>) gives exactly this kind of odds ratio for a one-unit increase in that feature.</p>
+  </div>
+
+  <h2>Example</h2>
+  <div class="ex">
+    <div class="et">🎓 Worked Example</div>
+    <p>If a tumor has predicted probability of malignancy p = 0.8:</p>
+    <p><strong>Odds</strong> = 0.8 / 0.2 = <strong>4</strong> (malignant is 4× as likely as benign for this tumor)</p>
+    <p><strong>Logit</strong> = ln(4) ≈ <strong>1.386</strong> (the raw linear score the model produced before the sigmoid squashed it)</p>
+  </div>
+
+  <h2>Python Code</h2>
+  <div class="co"><span class="cl">Python</span><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">sigmoid</span>(z):
+    <span class="kw">return</span> <span class="num">1</span> / (<span class="num">1</span> + np.exp(-z))
+
+p = sigmoid(<span class="num">1.386</span>)
+<span class="fn">print</span>(<span class="str">f"Probability: {p:.3f}"</span>)  <span class="cm"># ≈ 0.800</span>
+
+odds = p / (<span class="num">1</span> - p)
+<span class="fn">print</span>(<span class="str">f"Odds: {odds:.2f}"</span>)  <span class="cm"># 4.00</span></code></div>
+</div>
+</div>
+
+<!-- PAGE 3: BINARY CLASSIFICATION -->
+<div class="page" id="page-3">
+<div class="pg">
+  <h1>Binary Classification & Business Use Cases</h1>
+  <p class="sub">The two-class problem, and why choosing which class is "positive" is itself a meaningful decision.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>Binary classification sorts data into exactly two categories</strong>: a positive class (1, the event of interest) and a negative class (0, its absence). Which class you call "positive" should match what you actually care about detecting.</p>
+  </div>
+
+  <h2>Business Use Cases Across Industries</h2>
+  <table class="tb">
+    <tr><th>Domain</th><th>Positive Class (1)</th><th>Negative Class (0)</th></tr>
+    <tr><td>Medical diagnosis</td><td>Disease present (malignant)</td><td>Disease absent (benign)</td></tr>
+    <tr><td>Email filtering</td><td>Spam</td><td>Legitimate email</td></tr>
+    <tr><td>Fraud detection</td><td>Fraudulent transaction</td><td>Legitimate transaction</td></tr>
+    <tr><td>Loan approval</td><td>Will default</td><td>Will repay</td></tr>
+    <tr><td>Marketing</td><td>Customer will churn</td><td>Customer will stay</td></tr>
+  </table>
+
+  <div class="biz">
+    <div class="et">💼 Why "Choice of Positive Class" Matters</div>
+    <p>In our breast cancer dataset, sklearn's raw label convention is 0=malignant, 1=benign — but clinically, we should treat <strong>malignant as "positive"</strong>, since that's the condition we're trying to catch. Get this backwards, and your precision/recall numbers will describe the wrong thing entirely, even though the code runs without any error.</p>
+  </div>
+
+  <h2>Visual — The Binary Split</h2>
+  <div class="ex">
+    <svg viewBox="0 0 500 150" style="width:100%;max-width:460px;height:auto;">
+      <rect x="20" y="30" width="200" height="90" rx="10" style="fill:rgba(251,113,133,.13);stroke:var(--coral);stroke-width:2"/>
+      <text x="120" y="65" text-anchor="middle" font-size="13" style="fill:var(--coral);font-weight:700">Positive (1)</text>
+      <text x="120" y="85" text-anchor="middle" font-size="10.5" style="fill:var(--coral)">the event of interest</text>
+      <text x="120" y="102" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">e.g., "has cancer", "is spam"</text>
+      <rect x="280" y="30" width="200" height="90" rx="10" style="fill:rgba(52,211,153,.1);stroke:var(--green);stroke-width:2"/>
+      <text x="380" y="65" text-anchor="middle" font-size="13" style="fill:var(--green);font-weight:700">Negative (0)</text>
+      <text x="380" y="85" text-anchor="middle" font-size="10.5" style="fill:var(--green)">absence of the event</text>
+      <text x="380" y="102" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">e.g., "no cancer", "legit email"</text>
+    </svg>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 4: BINARY LOGISTIC REGRESSION -->
+<div class="page" id="page-4">
+<div class="pg">
+  <h1>Binary Logistic Regression & the Decision Boundary</h1>
+  <p class="sub">From a probability to an actual yes/no answer.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>Binary logistic regression estimates the probability of the positive class</strong> using the sigmoid function, then applies a threshold (typically 0.5) to convert that probability into a firm classification decision.</p>
+  </div>
+
+  <h2>Formula</h2>
+  <div class="fm">P(Y=1 | X) = σ(b₀ + b₁x₁ + b₂x₂ + ... + bₙxₙ)</div>
+  <div class="fm">If P(Y=1) &gt; threshold → predict class 1, else predict class 0</div>
+
+  <h2>Example</h2>
+  <div class="ex">
+    <div class="et">🎓 Example — Breast Cancer Prediction</div>
+    <p>For a specific tumor, the model computes P(malignant) = 0.87. Since 0.87 &gt; 0.5, the model predicts <strong>malignant</strong>. Training itself works by adjusting the coefficients (b) to maximize the likelihood of correctly predicting the training labels — this process is called <strong>Maximum Likelihood Estimation</strong>.</p>
+  </div>
+
+  <h2>Visual — Moving the Threshold Changes the Business Trade-off</h2>
+  <div class="ex">
+    <svg viewBox="0 0 600 200" style="width:100%;height:auto;">
+      <path d="M40,170 C150,170 200,20 300,20 C400,20 450,170 560,170" fill="none" style="stroke:var(--accent);stroke-width:0" opacity="0"/>
+      <path d="M40,170 C140,170 190,30 300,30 C410,30 460,170 560,170" fill="none" style="stroke:var(--accent);stroke-width:2.5"/>
+      <line x1="40" y1="170" x2="560" y2="170" style="stroke:var(--dim);stroke-width:1"/>
+      <line x1="300" y1="30" x2="300" y2="170" stroke-dasharray="4,3" style="stroke:var(--gold);stroke-width:2"/>
+      <text x="300" y="185" font-size="11" text-anchor="middle" style="fill:var(--gold);font-weight:700">default threshold = 0.5</text>
+      <line x1="220" y1="60" x2="220" y2="170" stroke-dasharray="4,3" style="stroke:var(--teal);stroke-width:2"/>
+      <text x="220" y="45" font-size="10" text-anchor="middle" style="fill:var(--teal);font-weight:700">lower threshold</text>
+      <text x="220" y="30" font-size="9" text-anchor="middle" style="fill:var(--teal)">→ catches more positives (higher recall)</text>
+    </svg>
+    <p>Lowering the threshold below 0.5 means the model calls more cases "positive" — in a cancer-screening context, this deliberately trades some extra false alarms for a lower chance of missing a real cancer. We demonstrate this exact trade-off with real numbers in the companion notebook.</p>
+  </div>
+
+  <div class="biz">
+    <div class="et">💼 Business Use Case — Threshold Is a Business Decision, Not Just a Default</div>
+    <p>A bank approving loans might RAISE the threshold for "predict default" to avoid rejecting too many good customers (protecting revenue). A hospital screening for cancer might LOWER the threshold for "predict malignant" to avoid missing any real cases (protecting lives). The "right" threshold depends entirely on which mistake costs more in that specific business.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 5: MULTICLASS & SOFTMAX -->
+<div class="page" id="page-5">
+<div class="pg">
+  <h1>Multiclass Classification & Softmax</h1>
+  <p class="sub">What happens when there are three or more categories instead of just two.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>Multiclass classification assigns each observation to one of three or more categories.</strong> Multiclass logistic regression extends the binary case using the <strong>softmax function</strong>, which converts raw scores for every class into probabilities that all sum to exactly 1.</p>
+  </div>
+
+  <h2>Formula</h2>
+  <div class="fm">P(class = k) = e<sup>z_k</sup> / Σ<sub>j</sub> e<sup>z_j</sup></div>
+
+  <h2>Example</h2>
+  <div class="ex">
+    <div class="et">🎓 Example — Iris Species (3 Classes)</div>
+    <p>For a given flower, the model computes raw scores for each species, then softmax converts them into: P(setosa)=0.02, P(versicolor)=0.85, P(virginica)=0.13. Since versicolor has the highest probability, the model predicts <strong>versicolor</strong>. Notice all three probabilities sum to 1.00.</p>
+  </div>
+
+  <div class="biz">
+    <div class="et">💼 Business Use Cases for Multiclass</div>
+    <p>Classifying support tickets into departments (billing / technical / sales), categorizing news articles by topic, recognizing handwritten digits (0-9), or — in a medical context — classifying a tumor into one of several cancer subtypes rather than just "cancer / no cancer."</p>
+  </div>
+
+  <h2>Visual — Softmax Distributes Probability Across All Classes</h2>
+  <div class="ex">
+    <svg viewBox="0 0 400 170" style="width:100%;max-width:380px;height:auto;">
+      <line x1="30" y1="140" x2="370" y2="140" style="stroke:var(--dim);stroke-width:1"/>
+      <rect x="60" y="130" width="60" height="10" style="fill:var(--muted)"/>
+      <text x="90" y="155" font-size="10" text-anchor="middle" style="fill:var(--muted)">setosa</text>
+      <text x="90" y="125" font-size="10" text-anchor="middle" style="fill:var(--muted)">0.02</text>
+      <rect x="170" y="30" width="60" height="110" style="fill:var(--accent)"/>
+      <text x="200" y="155" font-size="10" text-anchor="middle" style="fill:var(--accent);font-weight:700">versicolor</text>
+      <text x="200" y="25" font-size="10" text-anchor="middle" style="fill:var(--accent);font-weight:700">0.85 ✓</text>
+      <rect x="280" y="115" width="60" height="25" style="fill:var(--teal)"/>
+      <text x="310" y="155" font-size="10" text-anchor="middle" style="fill:var(--teal)">virginica</text>
+      <text x="310" y="110" font-size="10" text-anchor="middle" style="fill:var(--teal)">0.13</text>
+    </svg>
+    <p>All three bars' heights (probabilities) sum to 1.0 — the model picks whichever class has the tallest bar.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 6: CONFUSION MATRIX DEEP DIVE -->
+<div class="page" id="page-6">
+<div class="pg">
+  <h1>Confusion Matrix — Deep Dive</h1>
+  <p class="sub">The single most important table in classification — everything else on this page's neighbors (precision, recall, F1, ROC) is just arithmetic on these four numbers.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>A confusion matrix is a grid that shows exactly how many predictions fell into each combination of "what actually happened" and "what the model predicted."</strong> It's the raw material every other classification metric is built from.</p>
+  </div>
+
+  <h2>The Four Cells, Precisely Defined</h2>
+  <table class="tb">
+    <tr><th>Cell</th><th>Meaning</th><th>Also Known As</th></tr>
+    <tr><td><strong>True Positive (TP)</strong></td><td>Predicted positive, actually positive — correct catch</td><td>—</td></tr>
+    <tr><td><strong>True Negative (TN)</strong></td><td>Predicted negative, actually negative — correct clearance</td><td>—</td></tr>
+    <tr><td><strong>False Positive (FP)</strong></td><td>Predicted positive, actually negative — a false alarm</td><td><strong>Type I Error</strong></td></tr>
+    <tr><td><strong>False Negative (FN)</strong></td><td>Predicted negative, actually positive — a missed case</td><td><strong>Type II Error</strong></td></tr>
+  </table>
+
+  <h2>Visual — The 2×2 Grid</h2>
+  <div class="ex">
+    <svg viewBox="0 0 500 260" style="width:100%;max-width:460px;height:auto;">
+      <text x="290" y="20" font-size="12" text-anchor="middle" style="fill:var(--muted);font-weight:700">Actual</text>
+      <text x="180" y="215" font-size="12" text-anchor="middle" style="fill:var(--muted);font-weight:700" transform="rotate(-90 30 215)">Predicted</text>
+      <text x="220" y="45" font-size="11" text-anchor="middle" style="fill:var(--muted)">Positive</text>
+      <text x="360" y="45" font-size="11" text-anchor="middle" style="fill:var(--muted)">Negative</text>
+      <text x="70" y="105" font-size="11" text-anchor="middle" style="fill:var(--muted)">Positive</text>
+      <text x="70" y="200" font-size="11" text-anchor="middle" style="fill:var(--muted)">Negative</text>
+
+      <rect x="150" y="60" width="140" height="90" style="fill:rgba(52,211,153,.18);stroke:var(--green);stroke-width:1.5"/>
+      <text x="220" y="100" text-anchor="middle" font-size="15" style="fill:var(--green);font-weight:700">TP</text>
+      <text x="220" y="120" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">correct catch</text>
+
+      <rect x="290" y="60" width="140" height="90" style="fill:rgba(251,113,133,.18);stroke:var(--coral);stroke-width:1.5"/>
+      <text x="360" y="100" text-anchor="middle" font-size="15" style="fill:var(--coral);font-weight:700">FN</text>
+      <text x="360" y="120" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">Type II error</text>
+
+      <rect x="150" y="150" width="140" height="90" style="fill:rgba(250,204,21,.18);stroke:var(--gold);stroke-width:1.5"/>
+      <text x="220" y="190" text-anchor="middle" font-size="15" style="fill:var(--gold);font-weight:700">FP</text>
+      <text x="220" y="210" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">Type I error</text>
+
+      <rect x="290" y="150" width="140" height="90" style="fill:rgba(52,211,153,.1);stroke:var(--green);stroke-width:1.5"/>
+      <text x="360" y="190" text-anchor="middle" font-size="15" style="fill:var(--green);font-weight:700">TN</text>
+      <text x="360" y="210" text-anchor="middle" font-size="9.5" style="fill:var(--muted)">correct clearance</text>
+    </svg>
+  </div>
+
+  <h2>Example — Real Numbers from Our Breast Cancer Model</h2>
+  <div class="biz">
+    <div class="et">💼 The Actual Confusion Matrix (Malignant = Positive)</div>
+    <table class="tb">
+      <tr><th></th><th>Predicted Malignant</th><th>Predicted Benign</th></tr>
+      <tr><td><strong>Actual Malignant</strong></td><td style="color:var(--green);font-weight:700;">TP = 41</td><td style="color:var(--coral);font-weight:700;">FN = 1</td></tr>
+      <tr><td><strong>Actual Benign</strong></td><td style="color:var(--gold);font-weight:700;">FP = 1</td><td style="color:var(--green);font-weight:700;">TN = 71</td></tr>
+    </table>
+    <p>Out of 114 test patients: the model correctly caught 41 of 42 real malignant cases (missing just 1 — the FN/Type II error), and correctly cleared 71 of 72 benign cases (only 1 false alarm — the FP/Type I error). This is exactly the profile you WANT in cancer screening: almost no missed cancers, and only a single false alarm as the cost.</p>
+  </div>
+
+  <h2>Every Metric Is Built From These Four Numbers</h2>
+  <div class="g2">
+    <div class="gc pro">
+      <h4>Accuracy</h4>
+      <div class="fm" style="margin:8px 0;font-size:13px;">(TP+TN) / (TP+TN+FP+FN)</div>
+      <p style="font-size:12px;">= (41+71)/114 = 98.2%</p>
+    </div>
+    <div class="gc con">
+      <h4>Precision</h4>
+      <div class="fm" style="margin:8px 0;font-size:13px;">TP / (TP+FP)</div>
+      <p style="font-size:12px;">= 41/(41+1) = 97.6%</p>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="gc pro">
+      <h4>Recall (Sensitivity)</h4>
+      <div class="fm" style="margin:8px 0;font-size:13px;">TP / (TP+FN)</div>
+      <p style="font-size:12px;">= 41/(41+1) = 97.6%</p>
+    </div>
+    <div class="gc con">
+      <h4>Specificity</h4>
+      <div class="fm" style="margin:8px 0;font-size:13px;">TN / (TN+FP)</div>
+      <p style="font-size:12px;">= 71/(71+1) = 98.6%</p>
+    </div>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">Why Accuracy Alone Can Lie</span>
+    <p>Imagine a dataset where only 2% of patients actually have a rare disease. A model that predicts "no disease" for EVERYONE would score 98% accuracy — while catching zero real cases. This is exactly why we look at the full confusion matrix, not just accuracy, whenever classes are imbalanced or mistakes have different costs.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 7: TYPE I/II, ALPHA/BETA DEEP DIVE -->
+<div class="page" id="page-7">
+<div class="pg">
+  <h1>Type I & Type II Errors, Alpha & Beta — Deep Dive</h1>
+  <p class="sub">The two ways any classification decision can go wrong — and why business context, not math alone, decides which one to fear more.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">Type I Error (False Positive) — Probability = α</span>
+    <p>Predicting the <strong>positive</strong> class when the truth is actually <strong>negative</strong> — a false alarm. In hypothesis-testing language: rejecting a true null hypothesis. Its rate, α, is exactly the <strong>False Positive Rate</strong>: α = FP / (FP + TN) = 1 − Specificity.</p>
+  </div>
+  <div class="cd hl">
+    <span class="tg bl">Type II Error (False Negative) — Probability = β</span>
+    <p>Predicting the <strong>negative</strong> class when the truth is actually <strong>positive</strong> — a missed detection. Its rate, β, equals: β = FN / (FN + TP) = 1 − Recall. And <strong>Statistical Power = 1 − β = Recall (Sensitivity)</strong> — the exact same "Power" concept from Day 2's hypothesis testing material!</p>
+  </div>
+
+  <h2>Formula — The Precise Bridge Between Stats and Classification</h2>
+  <div class="fm">α (Type I rate) = FP / (FP + TN) = 1 − Specificity = False Positive Rate</div>
+  <div class="fm">β (Type II rate) = FN / (FN + TP) = 1 − Recall &nbsp;&nbsp;|&nbsp;&nbsp; Power = 1 − β = Recall</div>
+
+  <div class="cd info">
+    <span class="tg sk">Why "Recall = 1 − β = Power" Exactly — Step by Step</span>
+    <p>This isn't a coincidence or an approximation — it's the same fraction, just labeled two different ways depending on which field you learned it in. Let's derive it slowly, using our real breast cancer numbers (TP=41, FN=2):</p>
+    <ol class="st">
+      <li><strong>Start with the definition of β.</strong> β is "the probability of failing to detect a real positive case" = the fraction of actual positives that got MISSED = FN / (FN + TP) = 1/(1+41) = 1/42 ≈ 0.024 (2.4%).</li>
+      <li><strong>Now define Recall the same way, from the other direction.</strong> Recall is "the fraction of actual positives that got CAUGHT" = TP / (TP + FN) = 41/42 ≈ 0.976 (97.6%).</li>
+      <li><strong>Notice the denominators are identical</strong> — both are dividing by the SAME total (TP + FN = all actual positives = 43 real cancer cases). The only difference is the numerator: β counts the ones we missed (FN), Recall counts the ones we caught (TP).</li>
+      <li><strong>Since "caught" and "missed" are the only two possibilities</strong> for an actual positive case, they must add up to 100% of that group: (fraction caught) + (fraction missed) = 1. In symbols: Recall + β = 1.</li>
+      <li><strong>Rearranging gives:</strong> Recall = 1 − β. Check with real numbers: 1 − 0.024 = 0.976 ✓ — matches exactly.</li>
+      <li><strong>"Power" is just statistics' name for this same idea.</strong> In hypothesis testing, "power" means "the probability of correctly detecting a real effect when one truly exists" — which is precisely what Recall measures for a classifier. Two names, one formula: <strong>Power = Recall = 1 − β.</strong></li>
+    </ol>
+    <p><strong>Plain-English summary:</strong> out of every 100 real positive cases, some percentage gets caught (that's Recall, that's Power) and the rest gets missed (that's β). Since those two groups cover everyone, they must always sum to 100% — that's the whole "proof" in one sentence.</p>
+  </div>
+
+  <div class="ex">
+    <div class="et">🎓 Visual — Splitting "All Actual Positives" Into Caught vs Missed</div>
+    <svg viewBox="0 0 600 130" style="width:100%;height:auto;">
+      <text x="300" y="20" text-anchor="middle" font-size="12" style="fill:var(--muted);font-weight:700">All 42 Actual Malignant Cases (the full bar = 100%)</text>
+      <rect x="40" y="35" width="520" height="45" rx="6" style="fill:var(--card);stroke:var(--border);stroke-width:1"/>
+      <rect x="40" y="35" width="508" height="45" style="fill:rgba(52,211,153,.35);stroke:var(--green);stroke-width:1.5"/>
+      <rect x="548" y="35" width="12" height="45" style="fill:rgba(251,113,133,.4);stroke:var(--coral);stroke-width:1.5"/>
+      <text x="280" y="63" text-anchor="middle" font-size="12" style="fill:var(--green);font-weight:700">Caught (TP) = Recall = Power = 97.6%</text>
+      <text x="554" y="20" text-anchor="middle" font-size="10" style="fill:var(--coral);font-weight:700">Missed</text>
+      <text x="554" y="100" text-anchor="middle" font-size="10" style="fill:var(--coral);font-weight:700">(FN)</text>
+      <text x="554" y="113" text-anchor="middle" font-size="10" style="fill:var(--coral);font-weight:700">β=2.4%</text>
+    </svg>
+    <p>The bar's two segments always add up to the full 100% — there's no third option for an actual positive case. That's the entire reason Recall and β are just two ways of describing the same split.</p>
+  </div>
+
+  <h2>Visual — The Full Picture</h2>
+  <div class="ex">
+    <svg viewBox="0 0 600 200" style="width:100%;height:auto;">
+      <rect x="20" y="30" width="270" height="140" rx="8" style="fill:rgba(250,204,21,.1);stroke:var(--gold);stroke-width:1.5"/>
+
+      <text x="155" y="55" text-anchor="middle" font-size="13" style="fill:var(--gold);font-weight:700">Type I Error (α)</text>
+      <text x="155" y="78" text-anchor="middle" font-size="10.5" style="fill:var(--muted)">False Positive</text>
+      <text x="155" y="98" text-anchor="middle" font-size="10.5" style="fill:var(--muted)">"crying wolf"</text>
+      <text x="155" y="120" text-anchor="middle" font-size="10" style="fill:var(--muted)">e.g., healthy patient flagged sick,</text>
+      <text x="155" y="136" font-size="10" text-anchor="middle" style="fill:var(--muted)">legit email marked spam</text>
+      <text x="155" y="158" text-anchor="middle" font-size="10.5" style="fill:var(--gold);font-weight:700">α = 1 − Specificity</text>
+
+      <rect x="310" y="30" width="270" height="140" rx="8" style="fill:rgba(251,113,133,.1);stroke:var(--coral);stroke-width:1.5"/>
+      <text x="445" y="55" text-anchor="middle" font-size="13" style="fill:var(--coral);font-weight:700">Type II Error (β)</text>
+      <text x="445" y="78" text-anchor="middle" font-size="10.5" style="fill:var(--muted)">False Negative</text>
+      <text x="445" y="98" text-anchor="middle" font-size="10.5" style="fill:var(--muted)">"missing the wolf"</text>
+      <text x="445" y="120" text-anchor="middle" font-size="10" style="fill:var(--muted)">e.g., real cancer missed,</text>
+      <text x="445" y="136" font-size="10" text-anchor="middle" style="fill:var(--muted)">fraud transaction approved</text>
+      <text x="445" y="158" text-anchor="middle" font-size="10.5" style="fill:var(--coral);font-weight:700">β = 1 − Recall</text>
+    </svg>
+  </div>
+
+  <h2>The Decision Framework — "Which Error Costs More?"</h2>
+  <div class="cd hl">
+    <span class="tg bl">Ask This Question Every Time</span>
+    <p><strong>"What does a false positive cost me? What does a false negative cost me? Whichever is more expensive, minimize THAT error — even if it means accepting more of the other."</strong> This single question is the practical heart of "when is it very important."</p>
+  </div>
+
+  <h2>Business Deep Dive — Four Domains, Four Different Answers</h2>
+
+  <div class="biz">
+    <div class="et">💼 1. Medical Diagnosis (Cancer Screening) — Minimize Type II (β)</div>
+    <p><strong>H₀:</strong> "the patient does not have cancer."</p>
+    <p><strong>Type I (FP):</strong> a healthy patient is flagged as possibly having cancer → cost: anxiety, an unnecessary biopsy, follow-up appointments. Unpleasant, but recoverable.</p>
+    <p><strong>Type II (FN):</strong> an actual cancer patient is told they're healthy → cost: the disease progresses untreated, potentially becoming fatal. </p>
+    <p><strong>Priority:</strong> minimize β (maximize recall/sensitivity), even at the cost of a higher α. Our real model reflects this well: only 2 missed cancers (FN) out of 43, vs just 1 false alarm (FP).</p>
+  </div>
+
+  <div class="biz">
+    <div class="et">💼 2. Spam Email Filtering — Minimize Type I (α)</div>
+    <p><strong>H₀:</strong> "this email is legitimate."</p>
+    <p><strong>Type I (FP):</strong> a real, important email (a job offer, a client message) gets marked as spam and hidden → cost: potentially high, if the user never sees it.</p>
+    <p><strong>Type II (FN):</strong> a spam email slips into the inbox → cost: minor annoyance, quickly deleted.</p>
+    <p><strong>Priority:</strong> minimize α (maximize precision for "legitimate") — most spam filters are deliberately tuned to let some spam through rather than risk burying real mail.</p>
+  </div>
+
+  <div class="biz">
+    <div class="et">💼 3. Credit Card Fraud Detection — Depends on the Cost Ratio</div>
+    <p><strong>H₀:</strong> "this transaction is legitimate."</p>
+    <p><strong>Type I (FP):</strong> a legitimate purchase gets blocked → cost: customer frustration, possible loss of that customer.</p>
+    <p><strong>Type II (FN):</strong> a fraudulent transaction goes through → cost: direct financial loss, chargebacks.</p>
+    <p><strong>Priority:</strong> genuinely depends on the numbers — banks often calculate the average dollar cost of each error type and tune the threshold to that specific ratio, rather than picking one error type to minimize outright. A great open discussion question for the Workshop.</p>
+  </div>
+
+  <div class="biz">
+    <div class="et">💼 4. Airport Security Screening — Minimize Type II (β)</div>
+    <p><strong>Type I (FP):</strong> an innocent passenger gets extra screening → cost: inconvenience, delay.</p>
+    <p><strong>Type II (FN):</strong> an actual threat passes through undetected → cost: potentially catastrophic.</p>
+    <p><strong>Priority:</strong> strongly minimize β, similar to medical screening — accept many false alarms to avoid ever missing a real threat.</p>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">When Is This "Very Important"?</span>
+    <p>This trade-off matters most whenever: <strong>(1)</strong> the two error types have meaningfully different real-world costs, <strong>(2)</strong> the classes are imbalanced (so accuracy alone is misleading), or <strong>(3)</strong> the decision affects health, safety, money, or legal outcomes. In low-stakes, balanced-cost situations (e.g., recommending a movie), the distinction matters far less.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 8: CLASSIFICATION METRICS -->
+<div class="page" id="page-8">
+<div class="pg">
+  <h1>Classification Metrics: Precision, Recall, F1, Specificity</h1>
+  <p class="sub">Now that you know where these numbers come from, here's how to read and choose between them.</p>
+
+  <h2>Definition & Formula — Four Key Metrics</h2>
+  <table class="tb">
+    <tr><th>Metric</th><th>Formula</th><th>Answers</th></tr>
+    <tr><td><strong>Precision</strong></td><td>TP / (TP + FP)</td><td>Of everything I flagged positive, how much was correct?</td></tr>
+    <tr><td><strong>Recall (Sensitivity)</strong></td><td>TP / (TP + FN)</td><td>Of everything that was actually positive, how much did I catch?</td></tr>
+    <tr><td><strong>Specificity</strong></td><td>TN / (TN + FP)</td><td>Of everything actually negative, how much did I correctly clear?</td></tr>
+    <tr><td><strong>F1-Score</strong></td><td>2 × (Precision × Recall) / (Precision + Recall)</td><td>A single balanced summary of precision and recall</td></tr>
+  </table>
+
+  <h2>Example — Real Numbers from Breast Cancer</h2>
+  <div class="ex">
+    <div class="et">🎓 Computed from TP=41, FN=2, FP=1, TN=70</div>
+    <div class="bds">
+      <div class="bd" style="border-color:var(--teal);"><div class="v">97.6%</div><div class="l">Precision</div></div>
+      <div class="bd" style="border-color:var(--coral);"><div class="v">97.6%</div><div class="l">Recall</div></div>
+      <div class="bd" style="border-color:var(--gold);"><div class="v">98.6%</div><div class="l">Specificity</div></div>
+      <div class="bd" style="border-color:var(--green);"><div class="v">97.6%</div><div class="l">F1-Score</div></div>
+    </div>
+  </div>
+
+  <h2>Visual — Precision vs Recall Are Often in Tension</h2>
+  <div class="ex">
+    <svg viewBox="0 0 500 150" style="width:100%;max-width:460px;height:auto;">
+      <line x1="40" y1="120" x2="460" y2="120" style="stroke:var(--dim);stroke-width:1"/>
+      <text x="120" y="20" text-anchor="middle" font-size="11" style="fill:var(--teal);font-weight:700">High threshold → fewer positives predicted</text>
+      <text x="120" y="40" text-anchor="middle" font-size="10" style="fill:var(--muted)">Precision ↑ &nbsp; Recall ↓</text>
+      <text x="380" y="20" text-anchor="middle" font-size="11" style="fill:var(--coral);font-weight:700">Low threshold → more positives predicted</text>
+      <text x="380" y="40" text-anchor="middle" font-size="10" style="fill:var(--muted)">Precision ↓ &nbsp; Recall ↑</text>
+      <line x1="60" y1="100" x2="440" y2="100" style="stroke:var(--gold);stroke-width:2"/>
+      <circle cx="150" cy="100" r="6" style="fill:var(--teal)"/>
+      <circle cx="350" cy="100" r="6" style="fill:var(--coral)"/>
+      <text x="250" y="115" text-anchor="middle" font-size="10" style="fill:var(--muted)">moving the threshold slides you along this line</text>
+    </svg>
+  </div>
+
+  <h2>Choosing a Metric — Business Framing</h2>
+  <div class="g2">
+    <div class="gc pro"><h4>Optimize for Recall when...</h4><ul><li>Missing a positive case is costly (cancer, fraud, security threats)</li><li>You can tolerate more false alarms</li></ul></div>
+    <div class="gc con"><h4>Optimize for Precision when...</h4><ul><li>A false alarm is costly (spam filtering, blocking legitimate transactions)</li><li>You can tolerate missing a few positive cases</li></ul></div>
+  </div>
+
+  <div class="cd info">
+    <span class="tg sk">F1-Score — When to Use It</span>
+    <p>Use F1 when you want ONE number balancing both concerns roughly equally, or when comparing multiple models and neither precision nor recall clearly matters more. It's the harmonic mean, which punishes a big imbalance between precision and recall more than a simple average would.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 9: ROC AND AUC -->
+<div class="page" id="page-9">
+<div class="pg">
+  <h1>ROC Curve & AUC</h1>
+  <p class="sub">A single picture showing a model's performance across EVERY possible threshold at once — not just the default 0.5.</p>
+
+  <h2>Definition</h2>
+  <div class="cd hl">
+    <span class="tg bl">In Plain English</span>
+    <p><strong>The ROC (Receiver Operating Characteristic) curve plots True Positive Rate against False Positive Rate</strong> as the classification threshold sweeps from 0 to 1. <strong>AUC (Area Under the Curve)</strong> condenses that entire curve into one number summarizing overall discriminative ability.</p>
+  </div>
+
+  <h2>Formula / Axes</h2>
+  <div class="fm">Y-axis: TPR (Recall) = TP/(TP+FN) &nbsp;&nbsp; X-axis: FPR = FP/(FP+TN) = α</div>
+
+  <div class="cd warn">
+    <span class="tg yl">Never Forget the ROC Axes Again — Memory Tips</span>
+    <p><strong>The core trick that makes both formulas easy to derive on the spot:</strong> both axes are built the exact same way — (something we predicted positive) ÷ (a group of ACTUAL cases) — the only difference is which actual group sits in the denominator.</p>
+    <ul>
+      <li><strong>Y-axis (vertical) = True Positive Rate.</strong> Denominator = all ACTUAL positives (TP+FN). Question it answers: "Of everyone who truly has the condition, what fraction did we correctly catch?" This is a GOOD rate — you want it HIGH.</li>
+      <li><strong>X-axis (horizontal) = False Positive Rate.</strong> Denominator = all ACTUAL negatives (FP+TN). Question it answers: "Of everyone who's truly healthy, what fraction did we wrongly scare?" This is a BAD rate — you want it LOW.</li>
+    </ul>
+    <p><strong>Three different memory tricks — use whichever sticks for you:</strong></p>
+    <ol class="st">
+      <li><strong>The "good news goes up" trick.</strong> Good outcomes (catching real positives) get plotted going UP the Y-axis, like a success climbing higher. Bad outcomes (false alarms) get plotted going ACROSS the X-axis, like a mistake spreading sideways rather than being an achievement.</li>
+      <li><strong>The "best model lives top-left" trick.</strong> A perfect classifier sits at the TOP-LEFT corner: (FPR=0, TPR=1) — zero false alarms, every real case caught. If you remember "the trophy corner is top-left," you can always reconstruct that UP must be the rate you want high (TPR) and RIGHT must be the rate you want low (FPR) — there's no other way to make top-left the best spot.</li>
+      <li><strong>The weather-forecaster trick.</strong> Picture a forecaster predicting rain. Y-axis = "of the days it actually rained, how often did they correctly call it?" — their hit rate, something to be proud of, so it climbs UP. X-axis = "of the sunny days, how often did they wrongly cry 'rain'?" — their false-alarm habit, an embarrassing tally that spreads ACROSS, not up.</li>
+    </ol>
+    <p><strong>One more anchor point:</strong> the diagonal dashed line always runs from bottom-left (0,0) to top-right (1,1) — a coin-flip model that's just as likely to produce a hit as a false alarm. Any model worth using should bulge UP and to the LEFT of that line, toward the trophy corner.</p>
+    <p><strong>Applied to our real numbers:</strong> our breast cancer model has TPR≈97.6% (climbs almost to the top) and FPR≈1.4% (barely moves right) — which is exactly why its curve hugs the top-left corner so tightly in the chart below.</p>
+  </div>
+
+  <table class="tb">
+    <tr><th>AUC Value</th><th>Meaning</th></tr>
+    <tr><td>0.5</td><td>No better than random guessing</td></tr>
+    <tr><td>0.7 – 0.8</td><td>Acceptable discrimination</td></tr>
+    <tr><td>0.8 – 0.9</td><td>Excellent discrimination</td></tr>
+    <tr><td>0.9 – 1.0</td><td>Outstanding discrimination</td></tr>
+  </table>
+
+  <h2>Example — Real Result from Our Model</h2>
+  <div class="biz">
+    <div class="et">💼 Breast Cancer Model: AUC ≈ 0.995</div>
+    <p>An AUC this close to 1.0 means the model almost perfectly separates malignant from benign cases across every possible threshold — not just at the default 0.5. This is what makes it safe to consider LOWERING the threshold (as discussed in the Type I/II section) without destroying overall performance.</p>
+  </div>
+
+  <h2>Visual — Reading an ROC Curve</h2>
+  <div class="ex">
+    <svg viewBox="0 0 400 220" style="width:100%;max-width:380px;height:auto;">
+      <line x1="40" y1="180" x2="360" y2="180" style="stroke:var(--dim);stroke-width:1"/>
+      <line x1="40" y1="180" x2="40" y2="20" style="stroke:var(--dim);stroke-width:1"/>
+      <line x1="40" y1="180" x2="360" y2="20" stroke-dasharray="4,3" style="stroke:var(--muted);stroke-width:1.5"/>
+      <text x="300" y="35" font-size="10" style="fill:var(--muted)">random guess (AUC=0.5)</text>
+      <path d="M40,180 C50,60 60,30 100,25 C200,20 300,20 360,20" fill="none" style="stroke:var(--accent);stroke-width:2.5"/>
+      <text x="130" y="45" font-size="10" style="fill:var(--accent);font-weight:700">our model (AUC≈0.995)</text>
+      <text x="200" y="205" font-size="10" text-anchor="middle" style="fill:var(--muted)">False Positive Rate (bad, keep LOW) →</text>
+      <text x="20" y="100" font-size="10" text-anchor="middle" style="fill:var(--muted)" transform="rotate(-90 20 100)">True Positive Rate (good, want HIGH) →</text>
+      <circle cx="42" cy="22" r="5" style="fill:none;stroke:var(--gold);stroke-width:2"/>
+      <text x="55" y="15" font-size="9" style="fill:var(--gold);font-weight:700">trophy corner</text>
+    </svg>
+    <p>A curve that hugs the top-left corner (high TPR, low FPR) indicates a strong model. The diagonal line represents a model with zero discriminative ability — pure chance.</p>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">AUC-ROC vs AUC-PRC</span>
+    <p>AUC-ROC can look overly optimistic on heavily imbalanced datasets. <strong>AUC-PRC</strong> (Precision-Recall Curve) is often preferred in that situation, since it focuses specifically on how well the model handles the minority (often more important) class.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 10: HANDS-ON BREAST CANCER -->
+<div class="page" id="page-10">
+<div class="pg">
+  <h1>Hands-On: Binary Classification — Breast Cancer</h1>
+  <p class="sub">Bringing every concept from today together on a real, high-stakes dataset.</p>
+
+  <h2>The Dataset</h2>
+  <div class="cd hl">
+    <span class="tg bl">What's In It</span>
+    <p>569 tumor samples, 30 numeric features (radius, texture, perimeter, area, smoothness, concavity, etc., each with mean/error/worst versions), and a target: 0=malignant, 1=benign.</p>
+  </div>
+
+  <h2>How It Works — Build Order</h2>
+  <ol class="st">
+    <li><strong>Load & EDA</strong> — class balance (63% benign / 37% malignant), feature separability by class, correlation heatmap</li>
+    <li><strong>Preprocess</strong> — stratified train/test split, StandardScaler (important here, since sklearn's LogisticRegression uses L2 regularization by default)</li>
+    <li><strong>Train</strong> a LogisticRegression model</li>
+    <li><strong>Evaluate</strong> — confusion matrix (with malignant explicitly set as positive), precision/recall/specificity/F1, ROC-AUC</li>
+    <li><strong>Threshold-tune</strong> — show how lowering the threshold trades precision for recall</li>
+    <li><strong>Interpret</strong> coefficients</li>
+  </ol>
+
+  <h2>Example — Real Results</h2>
+  <div class="biz">
+    <div class="et">💼 Actual Output from the Companion Notebook</div>
+    <table class="tb">
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Accuracy</td><td>98.2%</td></tr>
+      <tr><td>Precision (malignant)</td><td>97.6%</td></tr>
+      <tr><td>Recall (malignant)</td><td>97.6%</td></tr>
+      <tr><td>Specificity</td><td>98.6%</td></tr>
+      <tr><td>AUC-ROC</td><td>0.995</td></tr>
+    </table>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">Trainer Tip</span>
+    <p>Ask the class: "the model missed 1 cancer case (FN). If you were the hospital's data science lead, would you lower the threshold to try to catch it too? What would that cost in extra false alarms?" — then run the actual threshold-tuning cell live to answer it with real numbers.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 11: HANDS-ON IRIS -->
+<div class="page" id="page-11">
+<div class="pg">
+  <h1>Hands-On: Multiclass Classification — Iris</h1>
+  <p class="sub">The classic 3-species flower dataset — small, clean, and perfect for seeing softmax and multiclass metrics in action.</p>
+
+  <h2>The Dataset</h2>
+  <div class="cd hl">
+    <span class="tg bl">What's In It</span>
+    <p>150 flowers, 4 features (sepal length/width, petal length/width), and 3 species: setosa, versicolor, virginica (50 each — perfectly balanced).</p>
+  </div>
+
+  <h2>How It Works — Build Order</h2>
+  <ol class="st">
+    <li><strong>Load & EDA</strong> — pairplot reveals setosa is easily separable; versicolor/virginica overlap more</li>
+    <li><strong>Preprocess</strong> — label-encode species, stratified split, scale features</li>
+    <li><strong>Train</strong> a multiclass LogisticRegression (softmax under the hood)</li>
+    <li><strong>Evaluate</strong> — classification report per class, confusion matrix heatmap</li>
+    <li><strong>ROC/AUC</strong> — one-vs-rest curve per species</li>
+  </ol>
+
+  <h2>Example — Real Results</h2>
+  <div class="biz">
+    <div class="et">💼 Actual Output from the Companion Notebook</div>
+    <table class="tb">
+      <tr><th>Species</th><th>Precision</th><th>Recall</th><th>F1</th></tr>
+      <tr><td>setosa</td><td>1.00</td><td>1.00</td><td>1.00</td></tr>
+      <tr><td>versicolor</td><td>0.90</td><td>0.90</td><td>0.90</td></tr>
+      <tr><td>virginica</td><td>0.90</td><td>0.90</td><td>0.90</td></tr>
+    </table>
+    <p>Overall accuracy: 93.3%. Every single misclassification happens between versicolor and virginica — never involving setosa — exactly matching what the EDA pairplot predicted before any model was even trained.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 12: PRO TIPS -->
+<div class="page" id="page-12">
+<div class="pg">
+  <h1>Pro Tips</h1>
+  <p class="sub">Habits that separate a classifier that "runs" from one that's actually safe to deploy.</p>
+
+  <div class="tip"><div class="tn">🎯 Positive Class</div>Always explicitly state (and set in code via <code>pos_label</code>) which class is "positive" — never assume it matches sklearn's default. Getting this backwards silently flips your precision/recall numbers.</div>
+
+  <div class="tip"><div class="tn">🎯 Beyond Accuracy</div>Never report accuracy alone on an imbalanced dataset. Always pair it with precision, recall, and a look at the full confusion matrix.</div>
+
+  <div class="tip"><div class="tn">⚖️ Threshold</div>The 0.5 threshold is a default, not a law. Explicitly choose a threshold based on the real cost of Type I vs Type II errors for your specific business problem.</div>
+
+  <div class="tip"><div class="tn">⚖️ Threshold</div>Plot precision and recall against threshold together (a "precision-recall vs threshold" chart) to pick a threshold deliberately rather than guessing.</div>
+
+  <div class="tip"><div class="tn">📏 Scaling</div>Unlike plain linear regression, logistic regression in sklearn uses regularization by default — ALWAYS scale your features first, or large-scale features will be unfairly penalized.</div>
+
+  <div class="tip"><div class="tn">📊 Class Imbalance</div>If one class is rare (fraud, rare disease), check class balance FIRST. Consider stratified splitting, class weighting, or resampling techniques before trusting any metric.</div>
+
+  <div class="tip"><div class="tn">📈 ROC vs PRC</div>On heavily imbalanced data, prefer the Precision-Recall curve (AUC-PRC) over ROC-AUC — ROC can look deceptively good even when the minority class is handled poorly.</div>
+
+  <div class="tip"><div class="tn">🔍 Multiclass</div>For multiclass problems, look at the FULL confusion matrix, not just overall accuracy — it tells you exactly which classes get confused with which.</div>
+
+  <div class="tip"><div class="tn">💼 Business Framing</div>Before building anything, explicitly write down: "what does a false positive cost us? What does a false negative cost us?" This single exercise should drive your metric choice and threshold from the very start of the project.</div>
+
+  <div class="tip"><div class="tn">🧪 Validation</div>Use a stratified train/test split for classification (not a plain random split) to make sure rare classes are still represented proportionally in both sets.</div>
+</div>
+</div>
+
+<!-- PAGE 13: WORKSHOP -->
+<div class="page" id="page-13">
+<div class="pg">
+  <h1>Workshop — Hands-On Practice</h1>
+  <p class="sub">Use the companion notebook, breast cancer dataset, and Iris dataset for every task below.</p>
+
+  <div class="cd hl">
+    <span class="tg bl">Task 1 — Positive Class Framing</span>
+    <p>Recompute precision and recall for the breast cancer model TREATING BENIGN AS POSITIVE (sklearn's default) instead of malignant. Compare the numbers to the clinically-correct version. Explain in one sentence why the difference matters.</p>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">Task 2 — Threshold Sweep</span>
+    <p>Using the notebook's `evaluate_at_threshold()` function, sweep thresholds from 0.1 to 0.9 in steps of 0.1 and plot precision and recall against threshold on the same chart.</p>
+  </div>
+
+  <div class="cd ok">
+    <span class="tg gn">Task 3 — Cost-Based Threshold Selection</span>
+    <p>Assume a missed cancer (FN) costs $500,000 (in outcomes and liability) and a false alarm (FP) costs $2,000 (extra testing). Using your threshold sweep from Task 2, calculate total expected cost at each threshold and pick the cheapest one.</p>
+  </div>
+
+  <div class="cd info">
+    <span class="tg sk">Task 4 — Business Case Study: Fraud Detection</span>
+    <p>Design a confusion-matrix based cost analysis for a credit card fraud model, where a missed fraud (FN) costs the average fraud amount ($150) and a false alarm (FP) costs $5 in customer service time. Which error would you prioritize minimizing, and why?</p>
+  </div>
+
+  <div class="cd hl">
+    <span class="tg bl">Task 5 — Multiclass Confusion Analysis</span>
+    <p>From the Iris confusion matrix, identify exactly which two species get confused with each other, and look up 2-3 features that might explain why (hint: check the pairplot from the EDA).</p>
+  </div>
+
+  <div class="cd warn">
+    <span class="tg yl">Task 6 — Class Imbalance Experiment</span>
+    <p>Already demonstrated in the notebook's bonus task — try re-running it with only 10 malignant cases instead of 20, and see how much worse recall gets.</p>
+  </div>
+
+  <div class="cd ok">
+    <span class="tg gn">Task 7 — Odds Ratio Interpretation</span>
+    <p>Pick the feature with the largest positive coefficient in the breast cancer model. Compute e^coefficient and explain what that odds ratio means in plain English for a hospital administrator.</p>
+  </div>
+
+  <div class="cd err">
+    <span class="tg rd">Task 8 — Write Your Own Business Case (Bonus)</span>
+    <p>Pick a business scenario not covered in this session (e.g., insurance claim fraud, employee attrition prediction, product defect detection). Define the positive class, describe what a Type I and Type II error would mean, and state which one you'd prioritize minimizing and why.</p>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 14: QUIZ -->
+<div class="page" id="page-14">
+<div class="pg">
+  <h1>Quick Quiz</h1>
+  <p class="sub">Test your understanding — click an option for instant feedback.</p>
+
+  <div class="qz" id="q1">
+    <div class="qt">Q1: What does the sigmoid function do?</div>
+    <div class="qo" onclick="chk('q1',this,false)">A) Removes outliers from the dataset</div>
+    <div class="qo" onclick="chk('q1',this,true)">B) Squeezes any real number into a value between 0 and 1</div>
+    <div class="qo" onclick="chk('q1',this,false)">C) Splits data into training and testing sets</div>
+    <div class="qo" onclick="chk('q1',this,false)">D) Calculates the correlation between two features</div>
+    <div class="qf" id="q1f"></div>
+  </div>
+
+  <div class="qz" id="q2">
+    <div class="qt">Q2: A False Positive is also known as which type of error?</div>
+    <div class="qo" onclick="chk('q2',this,false)">A) Type II Error</div>
+    <div class="qo" onclick="chk('q2',this,false)">B) Sampling Error</div>
+    <div class="qo" onclick="chk('q2',this,true)">C) Type I Error</div>
+    <div class="qo" onclick="chk('q2',this,false)">D) Measurement Error</div>
+    <div class="qf" id="q2f"></div>
+  </div>
+
+  <div class="qz" id="q3">
+    <div class="qt">Q3: In cancer screening, which error type is generally considered MORE dangerous?</div>
+    <div class="qo" onclick="chk('q3',this,false)">A) Type I error (false alarm) — because it wastes hospital resources</div>
+    <div class="qo" onclick="chk('q3',this,false)">B) Both are always equally costly in every context</div>
+    <div class="qo" onclick="chk('q3',this,false)">C) Neither — accuracy is all that matters</div>
+    <div class="qo" onclick="chk('q3',this,true)">D) Type II error (missed cancer) — because the disease goes untreated</div>
+    <div class="qf" id="q3f"></div>
+  </div>
+
+  <div class="qz" id="q4">
+    <div class="qt">Q4: Recall (Sensitivity) is mathematically equal to:</div>
+    <div class="qo" onclick="chk('q4',this,true)">A) 1 − β (statistical power)</div>
+    <div class="qo" onclick="chk('q4',this,false)">B) 1 − α</div>
+    <div class="qo" onclick="chk('q4',this,false)">C) TP / (TP + TN)</div>
+    <div class="qo" onclick="chk('q4',this,false)">D) FP / (FP + TN)</div>
+    <div class="qf" id="q4f"></div>
+  </div>
+
+  <div class="qz" id="q5">
+    <div class="qt">Q5: Why might accuracy be a misleading metric for a rare-disease detection model?</div>
+    <div class="qo" onclick="chk('q5',this,false)">A) Accuracy can never be computed for classification problems</div>
+    <div class="qo" onclick="chk('q5',this,false)">B) Accuracy only works for regression problems</div>
+    <div class="qo" onclick="chk('q5',this,true)">C) Predicting "no disease" for everyone can score high accuracy while catching zero real cases</div>
+    <div class="qo" onclick="chk('q5',this,false)">D) Accuracy requires a confusion matrix, which doesn't exist for rare diseases</div>
+    <div class="qf" id="q5f"></div>
+  </div>
+
+  <div class="qz" id="q6">
+    <div class="qt">Q6: For a spam filter, which metric would you typically prioritize, and why?</div>
+    <div class="qo" onclick="chk('q6',this,false)">A) Recall — because missing spam is very costly</div>
+    <div class="qo" onclick="chk('q6',this,false)">B) Specificity — because it doesn't matter which class is positive</div>
+    <div class="qo" onclick="chk('q6',this,false)">C) None of these — spam filters don't use classification metrics</div>
+    <div class="qo" onclick="chk('q6',this,true)">D) Precision — because blocking a real email (false positive) is costlier than letting spam through</div>
+    <div class="qf" id="q6f"></div>
+  </div>
+
+  <div class="qz" id="q7">
+    <div class="qt">Q7: An AUC-ROC of 0.5 means:</div>
+    <div class="qo" onclick="chk('q7',this,true)">A) The model performs no better than random guessing</div>
+    <div class="qo" onclick="chk('q7',this,false)">B) The model is 50% accurate</div>
+    <div class="qo" onclick="chk('q7',this,false)">C) The model perfectly separates the two classes</div>
+    <div class="qo" onclick="chk('q7',this,false)">D) Half of the predictions are false positives</div>
+    <div class="qf" id="q7f"></div>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 15: INTERVIEW QUESTIONS -->
+<div class="page" id="page-15">
+<div class="pg">
+  <h1>Interview Questions</h1>
+  <p class="sub">Common questions asked in Data Science / ML interviews on this topic. Click a question to reveal the answer.</p>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q1. Why can't we just use linear regression for a classification problem? <span class="car">▾</span></div>
+    <div class="ans">Linear regression can output values far outside the [0,1] range, which makes no sense as a probability, and it doesn't naturally model the S-shaped relationship between features and the probability of an event. Logistic regression solves both problems using the sigmoid function to constrain output between 0 and 1.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q2. Explain the confusion matrix and its four components. <span class="car">▾</span></div>
+    <div class="ans">A confusion matrix cross-tabulates actual vs predicted classes. True Positives (TP) and True Negatives (TN) are correct predictions. False Positives (FP, Type I error) are cases wrongly predicted positive; False Negatives (FN, Type II error) are cases wrongly predicted negative. Every other classification metric — accuracy, precision, recall, specificity, F1 — is calculated from these four numbers.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q3. What's the difference between Type I and Type II errors, and when does each matter most? <span class="car">▾</span></div>
+    <div class="ans">A Type I error (false positive) incorrectly flags something as positive when it isn't; a Type II error (false negative) misses a true positive. Which matters more depends entirely on the relative cost of each mistake in context: in medical screening or security, Type II errors (missed detections) are usually far more dangerous; in spam filtering, Type I errors (blocking legitimate content) are often costlier.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q4. How are alpha, beta, and statistical power related to precision and recall? <span class="car">▾</span></div>
+    <div class="ans">Alpha (the Type I error rate) equals the False Positive Rate: FP/(FP+TN), which is also 1 minus Specificity. Beta (the Type II error rate) equals FN/(FN+TP), which is 1 minus Recall. Statistical power, defined as 1-beta, is therefore mathematically identical to Recall (Sensitivity) — the same concept viewed through a hypothesis-testing lens versus a classification lens.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q5. When would you prioritize precision over recall, or vice versa? <span class="car">▾</span></div>
+    <div class="ans">Prioritize recall when missing a positive case is costly and false alarms are cheap to handle (cancer screening, fraud, security threats). Prioritize precision when a false alarm is costly and missing some positive cases is more tolerable (spam filtering, blocking legitimate transactions). When neither clearly dominates, F1-score offers a balanced single metric.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q6. Why is accuracy often a poor metric for imbalanced classification problems? <span class="car">▾</span></div>
+    <div class="ans">With a heavily skewed class distribution (e.g., 98% negative, 2% positive), a model that always predicts the majority class achieves high accuracy while being completely useless at detecting the minority class. Precision, recall, F1, and a full confusion matrix reveal this failure, while accuracy alone hides it.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q7. What is the ROC curve, and what does AUC tell you? <span class="car">▾</span></div>
+    <div class="ans">The ROC curve plots True Positive Rate against False Positive Rate as the classification threshold varies from 0 to 1, showing the full trade-off a model offers. AUC (Area Under the Curve) condenses this into a single number: 0.5 means no better than random guessing, and 1.0 means perfect separation between classes, regardless of threshold choice.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q8. How does multiclass logistic regression differ from binary logistic regression? <span class="car">▾</span></div>
+    <div class="ans">Binary logistic regression uses the sigmoid function to estimate the probability of a single positive class. Multiclass logistic regression uses the softmax function instead, computing a probability for every possible class simultaneously such that they all sum to 1, then predicting whichever class has the highest probability.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q9. Why does feature scaling matter more for logistic regression than for plain linear regression? <span class="car">▾</span></div>
+    <div class="ans">Scikit-learn's LogisticRegression applies L2 regularization by default, which penalizes large coefficients. Features on a larger numeric scale would otherwise need smaller coefficients to have the same effect, making them appear artificially "less important" under regularization unless all features are scaled to a comparable range first.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q10. How would you decide on a classification threshold other than the default 0.5? <span class="car">▾</span></div>
+    <div class="ans">Estimate (or look up) the real-world cost of a false positive and a false negative for your specific problem, then sweep across thresholds computing the total expected cost at each one (cost = FP_count × FP_cost + FN_count × FN_cost), choosing the threshold that minimizes total cost. This turns threshold selection into a business decision backed by data, not just a coding default.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q11. What's the difference between odds and probability, and why does logistic regression use odds? <span class="car">▾</span></div>
+    <div class="ans">Probability ranges from 0 to 1; odds (p/(1-p)) range from 0 to infinity, and the log-odds (logit) range across all real numbers — exactly matching the range of a linear combination of features. This is precisely why logistic regression models the log-odds as a linear function of the inputs, then converts back to probability via the sigmoid.</div>
+  </div>
+
+  <div class="iq" onclick="this.classList.toggle('open')">
+    <div class="qh">Q12. In a multiclass confusion matrix, how do you interpret off-diagonal cells? <span class="car">▾</span></div>
+    <div class="ans">Each off-diagonal cell (row = actual class, column = predicted class) shows exactly how many instances of one class were mistakenly predicted as another specific class. This is far more informative than an overall accuracy number, since it identifies precisely which pairs of classes the model tends to confuse — useful for guiding feature engineering or gathering more targeted training data.</div>
+  </div>
+</div>
+</div>
+
+</div><!-- pages-wrap -->
+
+<div class="prog" id="prog"></div>
+
+<script>
+const sections=["Agenda","Intro to LogReg","Sigmoid/Logit/Odds","Binary Classification","Decision Boundary","Multiclass & Softmax","Confusion Matrix","Type I/II & Alpha/Beta","Classification Metrics","ROC & AUC","Hands-On: Cancer","Hands-On: Iris","Pro Tips","Workshop","Quiz","Interview Qs"];
+const navTabs=document.getElementById('navTabs');
+const pages=document.querySelectorAll('.page');
+let cur=0;
+sections.forEach((n,i)=>{const t=document.createElement('div');t.className='nav-tab'+(i===0?' active':'');t.textContent=n;t.addEventListener('click',()=>go(i));navTabs.appendChild(t);});
+function go(i){pages[cur].classList.remove('active');document.querySelectorAll('.nav-tab')[cur].classList.remove('active');cur=i;pages[cur].classList.add('active');document.querySelectorAll('.nav-tab')[cur].classList.add('active');pages[cur].scrollTop=0;document.querySelectorAll('.nav-tab')[cur].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});up();}
+function up(){const p=pages[cur];const pct=p.scrollHeight<=p.clientHeight?100:(p.scrollTop/(p.scrollHeight-p.clientHeight))*100;document.getElementById('prog').style.width=pct+'%';}
+pages.forEach(p=>p.addEventListener('scroll',up));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&cur<sections.length-1)go(cur+1);if(e.key==='ArrowLeft'&&cur>0)go(cur-1);});
+pages[0].classList.add('active');up();
+
+const fb={
+  q1:{r:"Correct! The sigmoid function maps any real number into the range (0,1), letting a linear score be interpreted as a probability.",w:"The sigmoid function's job is to squeeze any real number into the (0,1) range — turning a raw linear score into a valid probability."},
+  q2:{r:"Correct! A False Positive is precisely a Type I error — predicting positive when the truth is negative.",w:"A False Positive is a Type I error. A False Negative would be the Type II error — keep these paired: FP=Type I, FN=Type II."},
+  q3:{r:"Correct! A missed cancer diagnosis (Type II / false negative) allows the disease to progress untreated — generally far more dangerous than a false alarm that simply triggers extra testing.",w:"Type II error (a missed cancer) is generally considered more dangerous in this context, since the disease can progress untreated — this is why cancer-screening models are tuned to prioritize recall."},
+  q4:{r:"Correct! Recall = 1-beta = statistical power — the same quantity described in hypothesis-testing language versus classification language.",w:"Recall is mathematically identical to statistical power, which equals 1-beta. This bridges the hypothesis-testing concept of 'power' directly to the classification concept of 'recall'."},
+  q5:{r:"Correct! With a rare positive class, predicting 'negative' for everyone can score deceptively high accuracy while catching zero real positive cases.",w:"The issue is that with a rare positive class, always predicting the majority (negative) class scores high accuracy while being completely useless — that's exactly why we look beyond accuracy for imbalanced problems."},
+  q6:{r:"Correct! For spam filters, a false positive (blocking a real email) is usually costlier than a false negative (letting one spam email through) — so precision is typically prioritized.",w:"Precision is usually prioritized for spam filters, since blocking a legitimate email (a false positive) is typically costlier than letting one spam message through."},
+  q7:{r:"Correct! AUC=0.5 falls exactly on the diagonal 'random guess' line — the model has no genuine ability to distinguish the two classes.",w:"AUC=0.5 means the model performs exactly as well as random guessing — it has no real discriminative power between the two classes."}
+};
+function chk(id,el,ok){const c=document.getElementById(id);if(c.classList.contains('done'))return;c.classList.add('done');const f=document.getElementById(id+'f');if(ok){el.classList.add('ok');f.className='qf show r';f.textContent=fb[id].r;}else{el.classList.add('no');f.className='qf show w';f.textContent=fb[id].w;}}
+</script>
+</body>
+</html>
